@@ -1,9 +1,6 @@
-import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
 const DragDrop = ({ handleImageSelect, children }) => {
-  
-
   const { getInputProps, getRootProps } = useDropzone({
     maxFiles: 1,
     accept: "image/*",
@@ -19,13 +16,15 @@ const DragDrop = ({ handleImageSelect, children }) => {
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
-    //   reader.readAsDataURL(file);
     });
 
   return (
     <section {...getRootProps({ className: "form_group" })}>
       <input {...getInputProps()} />
-      {children}
+      <label>
+        Drag files to add image to QR code
+        {children}
+      </label>
     </section>
   );
 };
