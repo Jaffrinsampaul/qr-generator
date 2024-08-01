@@ -60,18 +60,6 @@ const Home = () => {
     }
   }, [url]);
 
-  const apicall = useCallback(async () => {
-    console.log("url --->", url);
-    const response = await generateQRCode(
-      url,
-      qrCodeType,
-      bgColor,
-      foreGroundColor
-    );
-    const image = URL.createObjectURL(response);
-    setQrCode(image);
-    return image;
-  }, [url, qrCodeType, bgColor, foreGroundColor]);
   return (
     <main className="w-full h-screen bg-white ">
       <section
@@ -79,7 +67,7 @@ const Home = () => {
       flex justify-center items-center"
       >
         <div
-          className="flex flex-col justify-evenly items-center min-h-[40%] w-[50%] p-[15px] 
+          className="flex flex-col justify-evenly items-center min-h-[40%] w-[95%] sm:w-[50%] p-[15px] 
         border border-black border-opacity-15 rounded-[10px] gap-y-[30px] transition-all delay-300 duration-200 ease-linear"
           style={{
             boxShadow: "#d3d3d3 1px 5px 8px ",
@@ -88,7 +76,7 @@ const Home = () => {
           <header className="text-center">
             <h1 className="text-[20px] font-bold">QR Code Generator</h1>
           </header>
-          <label for="content" className="flex flex-col w-[70%] gap-y-[5px]">
+          <label for="content" className="flex flex-col sm:w-[70%] w-[90%] gap-y-[5px]">
             <input
               id="content"
               type="text"
@@ -101,25 +89,30 @@ const Home = () => {
           </label>
           {url ? (
             <section className="flex gap-x-[10px] items-center">
-              <DragDrop
-                handleImageSelect={(file) => {
-                  setUploadImage(file);
-                }}
-              >
-                <QrCoderRender
-                  bgColor={bgColor}
-                  fgColor={foreGroundColor}
-                  url={url}
-                  uploadImage={uploadImage}
-                />
-              </DragDrop>
-              {/* <img src={qrCode} alt="dsasdsa" height={100} width={100} /> */}
-              <button
-                onClick={downloadQrCode}
-                className=" text-blue-500 text-opacity-30 hover:text-opacity-100 transition-all delay-150 duration-150 ease-linear text-[20px] font-bold capitalize bounce"
-              >
-                download
-              </button>
+              <label className="flex flex-col gap-x-[10px] items-center">
+                Drag files to add image to QR code
+                <section className="flex gap-x-[10px] items-center">
+                  <DragDrop
+                    handleImageSelect={(file) => {
+                      setUploadImage(file);
+                    }}
+                  >
+                    <QrCoderRender
+                      bgColor={bgColor}
+                      fgColor={foreGroundColor}
+                      url={url}
+                      uploadImage={uploadImage}
+                    />
+                  </DragDrop>
+                  {/* <img src={qrCode} alt="dsasdsa" height={100} width={100} /> */}
+                  <button
+                    onClick={downloadQrCode}
+                    className=" text-blue-500 text-opacity-30 hover:text-opacity-100 transition-all delay-150 duration-150 ease-linear text-[20px] font-bold capitalize bounce"
+                  >
+                    download
+                  </button>
+                </section>
+              </label>
             </section>
           ) : (
             <p>QR Not found </p>

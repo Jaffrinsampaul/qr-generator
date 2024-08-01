@@ -21,10 +21,8 @@ const DragDrop = ({ handleImageSelect, children }) => {
   return (
     <section {...getRootProps({ className: "form_group" })}>
       <input {...getInputProps()} />
-      <label>
-        Drag files to add image to QR code
-        {children}
-      </label>
+     
+      {children}
     </section>
   );
 };
