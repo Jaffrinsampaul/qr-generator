@@ -8,11 +8,11 @@ import { memo, useCallback, useState } from "react";
 const Home = () => {
   const [url, setUrl] = useState(null);
   const [content, setContent] = useState(null);
-  const [qrCode, setQrCode] = useState(null);
+  const [size, setSize] = useState(40);
   const [qrCodeType, setQrCodeType] = useState("png");
   const [bgColor, setBgColor] = useState("#ffffff");
   const [foreGroundColor, setForeGround] = useState("#000000");
-  const [uploadImage, setUploadImage] = useState("");
+  const [uploadImage, setUploadImage] = useState(null);
 
   const handleUrl = useCallback(
     (event) => setContent(event.target.value),
@@ -60,6 +60,11 @@ const Home = () => {
     }
   }, [url]);
 
+  const handleRange = useCallback(
+    (event) => setSize(event.target.value),
+    [size]
+  );
+
   return (
     <main className="w-full h-screen bg-white ">
       <section
@@ -76,7 +81,10 @@ const Home = () => {
           <header className="text-center">
             <h1 className="text-[20px] font-bold">QR Code Generator</h1>
           </header>
-          <label for="content" className="flex flex-col sm:w-[70%] w-[90%] gap-y-[5px]">
+          <label
+            for="content"
+            className="flex flex-col sm:w-[70%] w-[90%] gap-y-[5px]"
+          >
             <input
               id="content"
               type="text"
@@ -88,8 +96,8 @@ const Home = () => {
             />
           </label>
           {url ? (
-            <section className="flex gap-x-[10px] items-center">
-              <label className="flex flex-col gap-x-[10px] items-center">
+            <section >
+              <label className="flex flex-col gap-x-[10px] gap-y-[12px] items-center">
                 Drag files to add image to QR code
                 <section className="flex gap-x-[10px] items-center">
                   <DragDrop
@@ -102,6 +110,7 @@ const Home = () => {
                       fgColor={foreGroundColor}
                       url={url}
                       uploadImage={uploadImage}
+                      size={size}
                     />
                   </DragDrop>
                   {/* <img src={qrCode} alt="dsasdsa" height={100} width={100} /> */}
@@ -136,8 +145,21 @@ const Home = () => {
               />
             </article>
           </section>
+          <section className="flex items-center gap-x-[10px]">
+            <label htmlFor="size">Size</label>
+            <input
+              type="range"
+              name=""
+              id="size"
+              value={size}
+              max={1000}
+              min={30}
+              onChange={handleRange}
+            />
+            <span>{size}</span>
+          </section>
           <button
-            className="capitalize bg-black bg-opacity-40 hover:bg-opacity-100 transition-all delay-150 duration-150 ease-linear text-white w-[50%] h-[35px] rounded-[10px]"
+            className="capitalize bg-black bg-opacity-40 hover:bg-opacity-100 transition-all delay-100 duration-150 ease-linear text-white w-[50%] h-[35px] rounded-[10px]"
             onClick={handleGenerateQrCode}
           >
             genrator QR code

@@ -5,12 +5,14 @@ const QrCoderRender = ({ url, bgColor, fgColor, size, uploadImage }) => {
     <>
       {url ? (
         <QrCode
+          size={size}
           value={url}
           bgColor={bgColor}
           fgColor={fgColor}
           imageSettings={{ src: uploadImage }}
-          level="M"
+          level="H"
           includeMargin
+          style={{overflow:"hidden", height:"100px", width:"100px"}}
         />
       ) : (
         ""
