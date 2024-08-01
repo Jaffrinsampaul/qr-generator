@@ -1,31 +1,27 @@
 "use client";
 
 import ColorPicker from "@/components/colorPicker/page";
+import DragDrop from "@/components/drag&drop/page";
+import QrCoderRender from "@/components/qrCodeRender/page";
 import { generateQRCode } from "@/service";
-import Image from "next/image";
 import { memo, useCallback, useState } from "react";
 const Home = () => {
   const [url, setUrl] = useState(null);
+  const [content, setContent] = useState(null);
   const [qrCode, setQrCode] = useState(null);
   const [qrCodeType, setQrCodeType] = useState("png");
   const [bgColor, setBgColor] = useState("#ffffff");
   const [foreGroundColor, setForeGround] = useState("#000000");
+  const [uploadImage, setUploadImage] = useState("");
 
-  const KEY_NAME = "Enter";
-  const handleUrl = useCallback((event) => setUrl(event.target.value), [url]);
-
-  const handleEnterKey = useCallback(
-    (event) =>
-      event.key === KEY_NAME
-        ? apicall(
-            url,
-            qrCodeType,
-            modifileColorCode(bgColor),
-            modifileColorCode(foreGroundColor)
-          )
-        : null,
-    [url]
+  const handleUrl = useCallback(
+    (event) => setContent(event.target.value),
+    [content]
   );
+
+  const handleGenerateQrCode = useCallback(() => {
+    setUrl(content);
+  }, [content]);
 
   const handleColor = useCallback((color, type) => {
     console.log("close --->", color, type);
@@ -39,14 +35,20 @@ const Home = () => {
     }
   }, []);
 
-  const modifileColorCode = useCallback((colorCode) => {
-    console.log(colorCode);
-    return colorCode.replaceAll("#", "");
+  const getGeneratedQR = useCallback(async () => {
+    // get generated QR
+    const canvas = document.querySelector("canvas");
+    const imageDataURI = canvas.toDataURL(qrCodeType, 1.0);
+    const blob = await (await fetch(imageDataURI)).blob();
+    const qrCode = window.URL.createObjectURL(blob);
+    return qrCode;
   }, []);
 
   const downloadQrCode = useCallback(async () => {
     try {
       const FILE_NAME = "qrcode";
+      const qrCode = await getGeneratedQR();
+      // Download generated QR
       const anchorTag = document.createElement("a");
       anchorTag.href = qrCode;
       anchorTag.download = `${FILE_NAME}.${qrCodeType}`;
@@ -56,11 +58,16 @@ const Home = () => {
     } catch (error) {
       console.error(error.message);
     }
-  }, [url, qrCode]);
+  }, [url]);
 
   const apicall = useCallback(async () => {
     console.log("url --->", url);
-    const response = await generateQRCode(url, qrCodeType, bgColor, foreGroundColor);
+    const response = await generateQRCode(
+      url,
+      qrCodeType,
+      bgColor,
+      foreGroundColor
+    );
     const image = URL.createObjectURL(response);
     setQrCode(image);
     return image;
@@ -80,25 +87,37 @@ const Home = () => {
         >
           <header className="text-center">
             <h1 className="text-[20px] font-bold">QR Code Generator</h1>
-            {/* <h3 className="font-semibold text-[15px]">
-              Enter any text to genrator a QR code
-            </h3> */}
           </header>
           <label for="content" className="flex flex-col w-[70%] gap-y-[5px]">
             <input
               id="content"
               type="text"
-              value={url}
+              value={content}
               // onKeyDown={handleEnterKey}
               onChange={handleUrl}
               className="text-black indent-[10px] focus:outline-none placeholder:text-center"
               placeholder="Enter any text to genrator a QR code"
             />
           </label>
-          {qrCode ? (
+          {url ? (
             <section className="flex gap-x-[10px] items-center">
-              <img src={qrCode} alt="dsasdsa" height={100} width={100} />
-              <button onClick={downloadQrCode} className=" text-blue-500 text-opacity-30 hover:text-opacity-100 transition-all delay-150 duration-150 ease-linear text-[20px] font-bold capitalize bounce">
+              <DragDrop
+                handleImageSelect={(file) => {
+                  setUploadImage(file);
+                }}
+              >
+                <QrCoderRender
+                  bgColor={bgColor}
+                  fgColor={foreGroundColor}
+                  url={url}
+                  uploadImage={uploadImage}
+                />
+              </DragDrop>
+              {/* <img src={qrCode} alt="dsasdsa" height={100} width={100} /> */}
+              <button
+                onClick={downloadQrCode}
+                className=" text-blue-500 text-opacity-30 hover:text-opacity-100 transition-all delay-150 duration-150 ease-linear text-[20px] font-bold capitalize bounce"
+              >
                 download
               </button>
             </section>
@@ -126,7 +145,7 @@ const Home = () => {
           </section>
           <button
             className="capitalize bg-black bg-opacity-40 hover:bg-opacity-100 transition-all delay-150 duration-150 ease-linear text-white w-[50%] h-[35px] rounded-[10px]"
-            onClick={apicall}
+            onClick={handleGenerateQrCode}
           >
             genrator QR code
           </button>
