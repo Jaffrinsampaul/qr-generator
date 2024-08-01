@@ -66,17 +66,25 @@ const Home = () => {
   );
 
   return (
-    <main className="w-full h-screen bg-white ">
+    <main
+      className="w-full h-screen bg-gradient-to-br from-amber-300 to-orange-600"
+      style={{}}
+    >
       <section
         className="w-[100%] h-full border border-black border-opacity-25 
       flex justify-center items-center"
       >
         <div
-          className="flex flex-col justify-evenly items-center min-h-[40%] w-[95%] sm:w-[50%] p-[15px] 
-        border border-black border-opacity-15 rounded-[10px] gap-y-[30px] transition-all delay-300 duration-200 ease-linear"
-          style={{
-            boxShadow: "#d3d3d3 1px 5px 8px ",
-          }}
+          className="flex flex-col justify-evenly items-center min-h-[50%] w-[95%] sm:w-[50%] p-[15px] bg-gray-950 backdrop-blur-2xl bg-opacity-15 border border-gray-100
+        border-opacity-15 rounded-[10px] gap-y-[30px] transition-all delay-300 duration-200 ease-linear"
+          style={
+            {
+              // boxShadow: "#d3d3d3 1px 5px 8px ",
+              // background: "rbga(255, 255, 255, 0)",
+              // backdropFilter: "blur(15px)",
+              // boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
+            }
+          }
         >
           <header className="text-center">
             <h1 className="text-[20px] font-bold">QR Code Generator</h1>
@@ -91,12 +99,12 @@ const Home = () => {
               value={content}
               // onKeyDown={handleEnterKey}
               onChange={handleUrl}
-              className="text-black indent-[10px] focus:outline-none placeholder:text-center"
+              className="text-black indent-[10px] bg-transparent focus:outline-none placeholder:text-center placeholder:text-black placeholder:text-opacity-55"
               placeholder="Enter any text to genrator a QR code"
             />
           </label>
           {url ? (
-            <section >
+            <section>
               <label className="flex flex-col gap-x-[10px] gap-y-[12px] items-center">
                 Drag files to add image to QR code
                 <section className="flex gap-x-[10px] items-center">
