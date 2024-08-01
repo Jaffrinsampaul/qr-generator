@@ -107,7 +107,7 @@ const Home = () => {
             <section>
               <label className="flex flex-col gap-x-[10px] gap-y-[12px] items-center">
                 Drag files to add image to QR code
-                <section className="flex gap-x-[10px] items-center">
+                <section className="flex gap-x-[20px] items-center">
                   <DragDrop
                     handleImageSelect={(file) => {
                       setUploadImage(file);
@@ -124,7 +124,7 @@ const Home = () => {
                   {/* <img src={qrCode} alt="dsasdsa" height={100} width={100} /> */}
                   <button
                     onClick={downloadQrCode}
-                    className=" text-blue-500 text-opacity-30 hover:text-opacity-100 transition-all delay-150 duration-150 ease-linear text-[20px] font-bold capitalize bounce"
+                    className=" text-black text-opacity-30 hover:text-opacity-100 transition-all delay-150 duration-150 ease-linear text-[20px] font-bold capitalize bounce"
                   >
                     download
                   </button>
