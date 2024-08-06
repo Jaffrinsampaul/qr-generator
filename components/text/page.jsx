@@ -1,9 +1,5 @@
 "use client";
-import DragDrop from "@/components/drag&drop/page";
-import QrCoderRender from "@/components/qrCodeRender/page";
 import { useCallback, useState } from "react";
-import ColorPicker from "@/components/colorPicker/page";
-import DefaultLayout from "@/layout/default";
 import { useQRgeneratedata } from "@/zustand/useQrGenerateData";
 
 const TextQr = () => {
@@ -13,7 +9,7 @@ const TextQr = () => {
 
   const handleUrl = useCallback(
     (event) => updateUserInput(event.target.value),
-    [content]
+    []
   );
 
   return (
@@ -28,7 +24,7 @@ const TextQr = () => {
         <input
           id="content"
           type="text"
-          value={content}
+          value={updateUserInput}
           // onKeyDown={handleEnterKey}
           onChange={handleUrl}
           className="text-black indent-[10px] bg-transparent focus:outline-none placeholder:text-center placeholder:text-black placeholder:text-opacity-55"
