@@ -15,7 +15,7 @@ const ColorPicker = ({ selectedColor, type, defaultvalue }) => {
 
   useEffect(() => {
     return () => {
-      selectedColor(currentColor, type);
+      if (currentColor) selectedColor(currentColor, type);
     };
   }, [currentColor]);
   console.log("current color -->", currentColor);
@@ -23,7 +23,10 @@ const ColorPicker = ({ selectedColor, type, defaultvalue }) => {
     <>
       <button
         className={` h-[30px] w-[30px] rounded-[5px] border relative`}
-        style={{ backgroundColor: `${currentColor}` , boxShadow: "#d3d3d3 1px 1px 1px 1px"}}
+        style={{
+          backgroundColor: `${currentColor}`,
+          boxShadow: "#d3d3d3 1px 1px 1px 1px",
+        }}
         onClick={tiggerColorPicker}
       >
         <input

@@ -47,3 +47,15 @@ body {
     transform: translateY(-20px);
   }
 }
+
+.modes:hover{
+  p{
+    opacity: 1;
+    color: white;
+  }
+}
+.modes{
+  p{
+    opacity: 0.6;
+  }
+}
