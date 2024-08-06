@@ -9,8 +9,8 @@ import { generateQRCode } from "@/service";
 import { useRouter, useSearchParams } from "next/navigation";
 import { memo, useCallback, useEffect, useState } from "react";
 import PhoneQR from "../components/phone/page";
-import TextQr from "@/components/text";
-import EmailQr from "@/components/email";
+import TextQr from "@/components/text/page";
+import EmailQr from "@/components/email/page";
 const Home = () => {
   // const [currentMode, setCurrentMode] = useState(null);
 
