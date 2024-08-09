@@ -5,12 +5,11 @@ import { useQRgeneratedata } from "@/zustand/useQrGenerateData";
 const TextQr = () => {
   const [content, setContent] = useState(null);
 
-  const updateUserInput = useQRgeneratedata((state) => state.updateUserInput);
+  const updateQrData = useQRgeneratedata((state) => state.updateUserInput);
+  const qrCodeData = useQRgeneratedata((state) => state.date);
+  console.log("qrcode --->", qrCodeData)
 
-  const handleUrl = useCallback(
-    (event) => updateUserInput(event.target.value),
-    []
-  );
+  const handleUrl = (event) => updateQrData(event.target.value);
 
   return (
     <>
@@ -24,7 +23,7 @@ const TextQr = () => {
         <input
           id="content"
           type="text"
-          value={updateUserInput}
+          value={qrCodeData}
           // onKeyDown={handleEnterKey}
           onChange={handleUrl}
           className="text-black indent-[10px] bg-transparent focus:outline-none placeholder:text-center placeholder:text-black placeholder:text-opacity-55"

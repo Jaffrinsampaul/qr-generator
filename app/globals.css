@@ -32,30 +32,89 @@ body {
   }
 } */
 
-
 .bounce {
   animation: bounce 1s ease-in-out infinite;
 }
 
-
-@keyframes bounce{
-  0%, 100%{
+@keyframes bounce {
+  0%,
+  100% {
     transform: translateY(0);
   }
 
-  50%{
+  50% {
     transform: translateY(-20px);
   }
 }
 
-.modes:hover{
-  p{
+.modes:hover {
+  h2 {
     opacity: 1;
     color: white;
   }
+  .svg-box {
+    border: none;
+    background-color: rgba(0, 0, 0, 0.9);
+  }
+  svg {
+    fill: white;
+    opacity: 1;
+    stroke: white;
+    /* transition: fill .3s; */
+  }
+  /* .svg-box:nth-child(2){ */
+   /* svg path, svg rect{
+    stroke: red;
+   } */
+  /* } */
 }
-.modes{
-  p{
+.modes {
+  h2 {
     opacity: 0.6;
   }
+  svg {
+    fill: black;
+    transition: fill, stroke .3s;
+    height: 30px;
+    width: 40px;
+    opacity: 0.35;
+  }
+
+  .svg-box {
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    border-radius: 5px;
+    height: 35px;
+    width: 50px;
+  }
+  transition-duration: 300ms;
+  transition-delay: 300ms;
+  transition: all;
+}
+/* .modes svg{
+  fill: black;
+  transition: fill .3s;
+  height: 30px;
+  width: 40px;
+}
+ */
+/* App.css */
+.svg-gallery {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.svg-container {
+  display: inline-block;
+  margin: 10px;
+}
+
+.svg-icon svg {
+  transition:stroke 0.3s;
+  width: 100px; /* Adjust size as needed */
+  height: 100px; /* Adjust size as needed */
+}
+
+.svg-icon:hover svg {
+  fill: red; /* Change fill color on hover */
+  stroke: blue; /* Change stroke color on hover */
 }

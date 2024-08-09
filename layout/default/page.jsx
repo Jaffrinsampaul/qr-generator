@@ -95,7 +95,7 @@ const DefaultLayout = ({ children }) => {
       flex justify-center items-center"
       >
         <div
-          className="flex flex-col justify-evenly items-center min-h-[50%] w-[95%] sm:w-[50%] p-[15px] bg-gray-950 backdrop-blur-2xl bg-opacity-15 border border-gray-100
+          className="flex flex-col justify-evenly items-center min-h-[50%] w-[95%] sm:w-[70%] p-[15px] bg-gray-950 backdrop-blur-2xl bg-opacity-15 border border-gray-100
         border-opacity-15 rounded-[10px] gap-y-[30px] transition-all delay-300 duration-200 ease-linear"
         >
           

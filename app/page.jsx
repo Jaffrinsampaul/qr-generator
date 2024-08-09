@@ -6,6 +6,7 @@ import { memo, Suspense, useCallback, useEffect, useState } from "react";
 import PhoneQR from "../components/phone/page";
 import TextQr from "@/components/text/page";
 import EmailQr from "@/components/email/page";
+import WifiQr from "@/components/wifi/page";
 const Home = () => {
   // const [currentMode, setCurrentMode] = useState(null);
 
@@ -32,6 +33,8 @@ const Home = () => {
           <PhoneQR data={currentData} />
         ) : currentMode === "email" ? (
           <EmailQr data={currentData} />
+        ) : currentMode === "wifi" ? (
+          <WifiQr />
         ) : (
           <p>Under dev</p>
         )}
