@@ -132,6 +132,13 @@ button { cursor: pointer; }
 .transparent-toggle { display: inline-flex; align-items: center; gap: 7px; margin-left: auto; color: var(--muted); font-size: 11px; cursor: pointer; }
 .transparent-toggle input { accent-color: var(--coral); }
 
+.logo-adjustments { display: flex; flex-direction: column; gap: 10px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid var(--line); }
+.rotation-controls { display: flex; flex-direction: column; gap: 8px; }
+.rotation-actions { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+.rotate-btn { border: 1px solid var(--line); background: #ffffff; color: var(--ink); border-radius: 8px; padding: 5px 10px; font-size: 10px; font-weight: 700; transition: all .15s ease; }
+.rotate-btn:hover { border-color: var(--coral); background: #fff7f5; }
+.rotate-reset-btn { border: 0; background: transparent; color: var(--muted); font-size: 10px; font-weight: 700; text-decoration: underline; }
+
 /* Download Button */
 .download-button { display: flex; justify-content: space-between; align-items: center; border: 0; border-radius: 11px; padding: 14px 16px; background: var(--ink); color: white; font-size: 13px; font-weight: 800; transition: background .2s ease; }
 .download-button:hover:not(:disabled) { background: #0f172a; }

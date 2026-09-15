@@ -70,6 +70,8 @@ export default function Home() {
   const [size, setSize] = useState(260);
   const [transparent, setTransparent] = useState(false);
   const [logo, setLogo] = useState("");
+  const [logoSizePercent, setLogoSizePercent] = useState(22);
+  const [logoRotation, setLogoRotation] = useState(0);
 
   // Pattern & Eye State
   const [pattern, setPattern] = useState("square");
@@ -130,6 +132,8 @@ export default function Home() {
     setSize(260);
     setTransparent(false);
     setLogo("");
+    setLogoSizePercent(22);
+    setLogoRotation(0);
     setPattern("square");
     setEyeOuter("square");
     setEyeInner("square");
@@ -429,6 +433,8 @@ export default function Home() {
                 background={background}
                 transparent={transparent}
                 logo={logo}
+                logoSizePercent={logoSizePercent}
+                logoRotation={logoRotation}
                 pattern={pattern}
                 eyeOuter={eyeOuter}
                 eyeInner={eyeInner}
@@ -579,6 +585,58 @@ export default function Home() {
                     Transparent QR
                   </label>
                 </div>
+
+                {logo && (
+                  <div className="logo-adjustments margin-top">
+                    <div className="logo-slider-group">
+                      <label className="size-control">
+                        <span>Logo Image Size ({logoSizePercent}%)</span>
+                        <input
+                          type="range"
+                          min="12"
+                          max="34"
+                          step="1"
+                          value={logoSizePercent}
+                          onChange={(e) => setLogoSizePercent(Number(e.target.value))}
+                        />
+                      </label>
+                    </div>
+
+                    <div className="logo-rotation-group margin-top">
+                      <div className="rotation-controls">
+                        <label className="size-control">
+                          <span>Logo Rotation ({logoRotation}°)</span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="360"
+                            step="5"
+                            value={logoRotation}
+                            onChange={(e) => setLogoRotation(Number(e.target.value))}
+                          />
+                        </label>
+                        <div className="rotation-actions">
+                          <button
+                            type="button"
+                            className="rotate-btn"
+                            onClick={() => setLogoRotation((prev) => (prev + 90) % 360)}
+                          >
+                            🔄 Rotate 90°
+                          </button>
+                          {logoRotation !== 0 && (
+                            <button
+                              type="button"
+                              className="rotate-reset-btn"
+                              onClick={() => setLogoRotation(0)}
+                            >
+                              Reset
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

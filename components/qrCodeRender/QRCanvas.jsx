@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
-import { generateQRMatrix, isFinderPattern, getFinderType } from "../../utils/qrcodegen";
+import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
+import { generateQRMatrix, isFinderPattern } from "../../utils/qrcodegen";
 
 const QRCanvas = forwardRef(function QRCanvas(
   {
@@ -11,6 +11,8 @@ const QRCanvas = forwardRef(function QRCanvas(
     background = "#ffffff",
     transparent = false,
     logo = "",
+    logoSizePercent = 22, // 12% to 35% of matrix size
+    logoRotation = 0, // 0 to 360 degrees
     pattern = "square", // square, dots, rounded, classy, diamond, star, fluid
     eyeOuter = "square", // square, circle, rounded, diamond
     eyeInner = "square", // square, circle, diamond, rounded
@@ -28,6 +30,28 @@ const QRCanvas = forwardRef(function QRCanvas(
   ref
 ) {
   const canvasRef = useRef(null);
+  const [loadedImg, setLoadedImg] = useState(null);
+
+  // Preload logo image synchronously for canvas rendering
+  useEffect(() => {
+    if (!logo) {
+      setLoadedImg(null);
+      return;
+    }
+    let isMounted = true;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = logo;
+    img.onload = () => {
+      if (isMounted) setLoadedImg(img);
+    };
+    img.onerror = () => {
+      if (isMounted) setLoadedImg(null);
+    };
+    return () => {
+      isMounted = false;
+    };
+  }, [logo]);
 
   useImperativeHandle(ref, () => ({
     getCanvas: () => canvasRef.current,
@@ -53,8 +77,8 @@ const QRCanvas = forwardRef(function QRCanvas(
     const matrixSize = qrData.size;
     const modules = qrData.modules;
 
-    // High DPI scaling factor
-    const dpr = 3; 
+    // High DPI scaling factor for crisp output
+    const dpr = 3;
 
     // Determine canvas frame layout dimensions
     let frameWidth = size;
@@ -124,26 +148,21 @@ const QRCanvas = forwardRef(function QRCanvas(
 
     // 1. Draw Frame Outer Background
     if (frameStyle === "checkin") {
-      // Card container shadow & fill
       drawRoundedRect(ctx, 0, 0, targetWidth, targetHeight, 22, true, false, "#ffffff", "");
-      
-      // Top banner accent
+
       ctx.fillStyle = frameColor;
       ctx.beginPath();
       ctx.roundRect(0, 0, targetWidth, 48, [22, 22, 0, 0]);
       ctx.fill();
 
-      // Top Header Title & Icon
       ctx.fillStyle = frameTextColor;
       ctx.font = "bold 13px system-ui, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(`🏷️  ${(frameTitle || "ONLINE CHECK-IN").toUpperCase()}`, targetWidth / 2, 24);
 
-      // QR inner white box
       drawRoundedRect(ctx, qrX - 6, qrY - 6, size + 12, size + 12, 16, true, true, transparent ? "#ffffff" : background, "#e3e7ef");
 
-      // Bottom CTA Banner
       const ctaY = qrY + size + 12;
       ctx.fillStyle = frameColor;
       ctx.beginPath();
@@ -155,25 +174,20 @@ const QRCanvas = forwardRef(function QRCanvas(
       ctx.fillText(`${frameText || "SCAN TO CHECK IN"}  →`, targetWidth / 2, ctaY + 17);
 
     } else if (frameStyle === "phone") {
-      // Smartphone body
       drawRoundedRect(ctx, 0, 0, targetWidth, targetHeight, 32, true, true, "#1e293b", frameColor);
-      
-      // Speaker grille / notch
+
       ctx.fillStyle = "#0f172a";
       ctx.beginPath();
       ctx.roundRect(targetWidth / 2 - 24, 12, 48, 8, 4);
       ctx.fill();
 
-      // Screen background
       drawRoundedRect(ctx, 12, 32, targetWidth - 24, targetHeight - 52, 20, true, false, transparent ? "#ffffff" : background, "");
 
-      // Home indicator bar
       ctx.fillStyle = "#64748b";
       ctx.beginPath();
       ctx.roundRect(targetWidth / 2 - 30, targetHeight - 14, 60, 4, 2);
       ctx.fill();
 
-      // Floating bottom badge
       if (frameText) {
         const tagY = qrY + size + 10;
         ctx.fillStyle = frameColor;
@@ -189,10 +203,8 @@ const QRCanvas = forwardRef(function QRCanvas(
       }
 
     } else if (frameStyle === "bottom-badge") {
-      // Container border
       drawRoundedRect(ctx, 0, 0, targetWidth, targetHeight - 16, 20, true, true, transparent ? "transparent" : background, frameColor);
 
-      // Overlapping bottom badge
       const badgeY = targetHeight - 34;
       ctx.fillStyle = frameColor;
       ctx.beginPath();
@@ -206,35 +218,29 @@ const QRCanvas = forwardRef(function QRCanvas(
       ctx.fillText(`✨ ${frameText || "SCAN ME"}`, targetWidth / 2, badgeY + 16);
 
     } else if (frameStyle === "top-bottom-card") {
-      // Polaroid style card
       drawRoundedRect(ctx, 0, 0, targetWidth, targetHeight, 18, true, true, "#ffffff", "#e2e8f0");
 
-      // Top Title
       ctx.fillStyle = "#1e293b";
       ctx.font = "bold 14px system-ui, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(frameTitle || "SCAN ME", targetWidth / 2, 26);
 
-      // QR container
       drawRoundedRect(ctx, qrX - 4, qrY - 4, size + 8, size + 8, 12, true, false, transparent ? "#ffffff" : background, "");
 
-      // Bottom subtext
       ctx.fillStyle = "#64748b";
       ctx.font = "500 11px system-ui, sans-serif";
       ctx.fillText(frameText || "Point phone camera to scan", targetWidth / 2, qrY + size + 24);
 
     } else if (frameStyle === "ticket") {
-      // Ticket body
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = frameColor;
       ctx.lineWidth = 3;
 
       ctx.beginPath();
-      // Draw path with left & right notch cuts
       const notchR = 12;
       const notchY = 45;
-      
+
       ctx.moveTo(16, 0);
       ctx.lineTo(targetWidth - 16, 0);
       ctx.quadraticCurveTo(targetWidth, 0, targetWidth, 16);
@@ -252,14 +258,12 @@ const QRCanvas = forwardRef(function QRCanvas(
       ctx.fill();
       ctx.stroke();
 
-      // Top pass header
       ctx.fillStyle = frameColor;
       ctx.font = "bold 12px system-ui, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(`🎟️ ${(frameTitle || "EVENT PASS").toUpperCase()}`, targetWidth / 2, 22);
 
-      // Dashed separator line
       ctx.setLineDash([5, 4]);
       ctx.strokeStyle = "#cbd5e1";
       ctx.beginPath();
@@ -268,13 +272,11 @@ const QRCanvas = forwardRef(function QRCanvas(
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Bottom CTA
       ctx.fillStyle = "#334155";
       ctx.font = "bold 11px system-ui, sans-serif";
       ctx.fillText(frameText || "SCAN TO ENTER", targetWidth / 2, qrY + size + 22);
 
     } else if (frameStyle === "circle-ring") {
-      // Circular container background
       const cx = targetWidth / 2;
       const cy = targetHeight / 2;
 
@@ -283,14 +285,12 @@ const QRCanvas = forwardRef(function QRCanvas(
       ctx.arc(cx, cy, targetWidth / 2 - 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // Outer accent ring
       ctx.strokeStyle = frameColor;
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.arc(cx, cy, targetWidth / 2 - 6, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Bottom Pill Tag
       ctx.fillStyle = frameColor;
       ctx.beginPath();
       ctx.roundRect(cx - 60, targetHeight - 30, 120, 24, 12);
@@ -303,10 +303,8 @@ const QRCanvas = forwardRef(function QRCanvas(
       ctx.fillText(frameText || "SCAN HERE", cx, targetHeight - 18);
 
     } else if (frameStyle === "sleek-neon") {
-      // Glow background container
       drawRoundedRect(ctx, 0, 0, targetWidth, targetHeight, 22, true, false, "#0f172a", "");
 
-      // Gradient border
       const gradBorder = ctx.createLinearGradient(0, 0, targetWidth, targetHeight);
       gradBorder.addColorStop(0, frameColor);
       gradBorder.addColorStop(1, "#38bdf8");
@@ -315,10 +313,8 @@ const QRCanvas = forwardRef(function QRCanvas(
       ctx.lineWidth = 3;
       ctx.strokeRect(3, 3, targetWidth - 6, targetHeight - 6);
 
-      // Inner white QR backdrop
       drawRoundedRect(ctx, qrX - 4, qrY - 4, size + 8, size + 8, 14, true, false, background, "");
 
-      // Bottom Pill
       const tagY = qrY + size + 12;
       ctx.fillStyle = gradBorder;
       ctx.beginPath();
@@ -332,43 +328,36 @@ const QRCanvas = forwardRef(function QRCanvas(
       ctx.fillText(`⚡ ${frameText || "CONNECT & SCAN"}`, targetWidth / 2, tagY + 13);
 
     } else if (frameStyle === "retro-corners") {
-      // Card back
       drawRoundedRect(ctx, 0, 0, targetWidth, targetHeight, 16, true, false, transparent ? "transparent" : background, "");
 
-      // Corner bracket ornaments
       ctx.strokeStyle = frameColor;
       ctx.lineWidth = 4;
       const bracketL = 20;
 
-      // Top Left
       ctx.beginPath();
       ctx.moveTo(qrX - 8, qrY - 8 + bracketL);
       ctx.lineTo(qrX - 8, qrY - 8);
       ctx.lineTo(qrX - 8 + bracketL, qrY - 8);
       ctx.stroke();
 
-      // Top Right
       ctx.beginPath();
       ctx.moveTo(qrX + size + 8 - bracketL, qrY - 8);
       ctx.lineTo(qrX + size + 8, qrY - 8);
       ctx.lineTo(qrX + size + 8, qrY - 8 + bracketL);
       ctx.stroke();
 
-      // Bottom Left
       ctx.beginPath();
       ctx.moveTo(qrX - 8, qrY + size + 8 - bracketL);
       ctx.lineTo(qrX - 8, qrY + size + 8);
       ctx.lineTo(qrX - 8 + bracketL, qrY + size + 8);
       ctx.stroke();
 
-      // Bottom Right
       ctx.beginPath();
       ctx.moveTo(qrX + size + 8 - bracketL, qrY + size + 8);
       ctx.lineTo(qrX + size + 8, qrY + size + 8);
       ctx.lineTo(qrX + size + 8, qrY + size + 8 - bracketL);
       ctx.stroke();
 
-      // Bottom text
       ctx.fillStyle = frameColor;
       ctx.font = "bold 12px system-ui, sans-serif";
       ctx.textAlign = "center";
@@ -376,7 +365,6 @@ const QRCanvas = forwardRef(function QRCanvas(
       ctx.fillText(frameText || "SCAN CODE", targetWidth / 2, qrY + size + 28);
 
     } else {
-      // Unframed default
       if (!transparent) {
         drawRoundedRect(ctx, 0, 0, targetWidth, targetHeight, 16, true, false, background, "");
       }
@@ -385,7 +373,6 @@ const QRCanvas = forwardRef(function QRCanvas(
     // 2. Prepare QR Matrix Drawing
     const tileSize = size / matrixSize;
 
-    // Ink Color or Gradient setup
     let fillInk = foreground;
     if (useGradient) {
       const grad = ctx.createLinearGradient(qrX, qrY, qrX + size, qrY + size);
@@ -394,15 +381,15 @@ const QRCanvas = forwardRef(function QRCanvas(
       fillInk = grad;
     }
 
-    // Outer & Inner Eye Colors
     const outerEyeColor = customEyeColor ? eyeOuterColor : fillInk;
     const innerEyeColor = customEyeColor ? eyeInnerColor : fillInk;
 
-    // Center Logo excavation zone calculations
+    // Center Logo excavation calculations
     let excavateStart = -1;
     let excavateEnd = -1;
     if (logo) {
-      const logoModules = Math.floor(matrixSize * 0.24); // 24% of matrix width
+      const ratio = Math.max(0.1, Math.min(0.36, logoSizePercent / 100));
+      const logoModules = Math.max(3, Math.floor(matrixSize * ratio));
       excavateStart = Math.floor((matrixSize - logoModules) / 2);
       excavateEnd = excavateStart + logoModules;
     }
@@ -417,7 +404,6 @@ const QRCanvas = forwardRef(function QRCanvas(
 
     for (let r = 0; r < matrixSize; r++) {
       for (let c = 0; c < matrixSize; c++) {
-        // Skip corner finder patterns & excavated center
         if (isFinderPattern(c, r, matrixSize)) continue;
         if (isExcavated(r, c)) continue;
 
@@ -430,7 +416,7 @@ const QRCanvas = forwardRef(function QRCanvas(
       }
     }
 
-    // 4. Draw Corner Finder Eyes (Top-Left, Top-Right, Bottom-Left)
+    // 4. Draw Corner Finder Eyes
     const eyeLocations = [
       { x: qrX, y: qrY }, // TL
       { x: qrX + (matrixSize - 7) * tileSize, y: qrY }, // TR
@@ -441,41 +427,49 @@ const QRCanvas = forwardRef(function QRCanvas(
     const eye3Size = 3 * tileSize;
 
     eyeLocations.forEach(({ x, y }) => {
-      // Clear 7x7 background space behind eye if needed
       ctx.fillStyle = background && !transparent ? background : "#ffffff";
       ctx.fillRect(x, y, eye7Size, eye7Size);
 
-      // Draw Eye Outer Ring (7x7 with 5x5 inner cutout)
       ctx.fillStyle = outerEyeColor;
       drawEyeOuterShape(ctx, x, y, eye7Size, tileSize, eyeOuter);
 
-      // Draw Eye Inner Ball (center 3x3)
       ctx.fillStyle = innerEyeColor;
       const innerX = x + 2 * tileSize;
       const innerY = y + 2 * tileSize;
       drawEyeInnerShape(ctx, innerX, innerY, eye3Size, tileSize, eyeInner);
     });
 
-    // 5. Draw Center Logo Image if present
-    if (logo) {
-      const logoSize = (excavateEnd - excavateStart) * tileSize;
+    // 5. Draw Center Logo Image SYNCHRONOUSLY with optional rotation
+    if (logo && loadedImg) {
+      const logoModules = (excavateEnd - excavateStart);
+      const logoPixelSize = logoModules * tileSize;
       const logoX = qrX + excavateStart * tileSize;
       const logoY = qrY + excavateStart * tileSize;
+      const centerX = logoX + logoPixelSize / 2;
+      const centerY = logoY + logoPixelSize / 2;
 
-      // Draw white rounded background behind logo
-      drawRoundedRect(ctx, logoX - 3, logoY - 3, logoSize + 6, logoSize + 6, 8, true, true, "#ffffff", "#e2e8f0");
+      // Draw white background container for logo
+      drawRoundedRect(ctx, logoX - 3, logoY - 3, logoPixelSize + 6, logoPixelSize + 6, 8, true, true, "#ffffff", "#cbd5e1");
 
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = logo;
-      img.onload = () => {
-        ctx.save();
-        ctx.beginPath();
-        ctx.roundRect(logoX, logoY, logoSize, logoSize, 6);
-        ctx.clip();
-        ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
-        ctx.restore();
-      };
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(logoX, logoY, logoPixelSize, logoPixelSize, 6);
+      ctx.clip();
+
+      // Translate origin to logo center and rotate
+      ctx.translate(centerX, centerY);
+      if (logoRotation) {
+        ctx.rotate((logoRotation * Math.PI) / 180);
+      }
+      ctx.drawImage(
+        loadedImg,
+        -logoPixelSize / 2,
+        -logoPixelSize / 2,
+        logoPixelSize,
+        logoPixelSize
+      );
+
+      ctx.restore();
     }
 
     ctx.restore();
@@ -486,6 +480,9 @@ const QRCanvas = forwardRef(function QRCanvas(
     background,
     transparent,
     logo,
+    logoSizePercent,
+    logoRotation,
+    loadedImg,
     pattern,
     eyeOuter,
     eyeInner,
@@ -570,7 +567,6 @@ function drawModulePattern(ctx, x, y, tileSize, pattern, modules, r, c, size) {
     ctx.closePath();
     ctx.fill();
   } else if (pattern === "fluid") {
-    // Check adjacent neighbors to render smooth fluid connections
     const top = r > 0 && modules[r - 1][c] && !isFinderPattern(c, r - 1, size);
     const bottom = r < size - 1 && modules[r + 1][c] && !isFinderPattern(c, r + 1, size);
     const left = c > 0 && modules[r][c - 1] && !isFinderPattern(c - 1, r, size);
@@ -585,7 +581,6 @@ function drawModulePattern(ctx, x, y, tileSize, pattern, modules, r, c, size) {
     ctx.roundRect(x, y, tileSize, tileSize, [radTL, radTR, radBR, radBL]);
     ctx.fill();
   } else {
-    // Default square
     ctx.fillRect(x, y, tileSize, tileSize);
   }
 }
@@ -625,7 +620,6 @@ function drawEyeOuterShape(ctx, x, y, size, tileSize, eyeOuter) {
 
     ctx.fill("evenodd");
   } else {
-    // Standard square outer eye
     ctx.fillRect(x, y, outerW, outerW);
     ctx.clearRect(x + innerOffset, y + innerOffset, innerW, innerW);
   }
@@ -653,7 +647,6 @@ function drawEyeInnerShape(ctx, x, y, size, tileSize, eyeInner) {
     ctx.roundRect(x, y, size, size, size * 0.35);
     ctx.fill();
   } else {
-    // Standard square inner eye
     ctx.fillRect(x, y, size, size);
   }
 }
