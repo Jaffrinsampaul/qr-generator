@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import QRCanvas from "../components/qrCodeRender/QRCanvas";
 import FrameControls from "../components/customizer/FrameControls";
@@ -94,6 +94,7 @@ export default function Home() {
 
   // Customizer Active Tab
   const [activeTab, setActiveTab] = useState("frames");
+  const [copiedToast, setCopiedToast] = useState(false);
 
   const canvasRef = useRef(null);
   const value = useMemo(() => buildValue(active, data[active]), [active, data]);
@@ -105,6 +106,68 @@ export default function Home() {
     () => getScannabilityStatus(foreground, background, transparent),
     [foreground, background, transparent]
   );
+
+  // Restore state from URL search params on load (for shared links)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const typeParam = params.get("type");
+    if (typeParam && TYPES.some((t) => t.id === typeParam)) {
+      setActive(typeParam);
+      const newData = { ...defaults };
+      if (typeParam === "url" || typeParam === "text") {
+        if (params.get("value")) newData[typeParam] = { value: params.get("value") };
+      } else if (typeParam === "wifi") {
+        newData.wifi = {
+          ssid: params.get("ssid") || "",
+          password: params.get("password") || "",
+          security: params.get("security") || "WPA",
+        };
+      } else if (typeParam === "email") {
+        newData.email = {
+          address: params.get("address") || "",
+          subject: params.get("subject") || "",
+          body: params.get("body") || "",
+        };
+      } else if (typeParam === "phone") {
+        newData.phone = { number: params.get("number") || "" };
+      } else if (typeParam === "sms") {
+        newData.sms = {
+          number: params.get("number") || "",
+          message: params.get("message") || "",
+        };
+      } else if (typeParam === "vcard") {
+        newData.vcard = {
+          name: params.get("name") || "",
+          phone: params.get("phone") || "",
+          email: params.get("email") || "",
+          company: params.get("company") || "",
+        };
+      } else if (typeParam === "location") {
+        newData.location = {
+          mapUrl: params.get("mapUrl") || "",
+          latitude: params.get("latitude") || "",
+          longitude: params.get("longitude") || "",
+          label: params.get("label") || "",
+        };
+      } else if (typeParam === "event") {
+        newData.event = {
+          title: params.get("title") || "",
+          location: params.get("location") || "",
+          start: params.get("start") || "",
+          end: params.get("end") || "",
+        };
+      }
+      setData(newData);
+
+      if (params.get("fg")) setForeground(params.get("fg"));
+      if (params.get("bg")) setBackground(params.get("bg"));
+      if (params.get("pattern")) setPattern(params.get("pattern"));
+      if (params.get("frameStyle")) setFrameStyle(params.get("frameStyle"));
+      if (params.get("frameText")) setFrameText(params.get("frameText"));
+      if (params.get("frameColor")) setFrameColor(params.get("frameColor"));
+    }
+  }, []);
 
   function handleLogoUpload(event) {
     const file = event.target.files?.[0];
@@ -136,6 +199,51 @@ export default function Home() {
     if (canvasRef.current) {
       canvasRef.current.downloadSVG(`qr-${active}.svg`);
     }
+  }
+
+  function copyShareLink() {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set("type", active);
+
+    const cur = data[active];
+    if (active === "url" || active === "text") {
+      if (cur.value) url.searchParams.set("value", cur.value);
+    } else if (active === "wifi") {
+      if (cur.ssid) url.searchParams.set("ssid", cur.ssid);
+      if (cur.password) url.searchParams.set("password", cur.password);
+      if (cur.security) url.searchParams.set("security", cur.security);
+    } else if (active === "email") {
+      if (cur.address) url.searchParams.set("address", cur.address);
+      if (cur.subject) url.searchParams.set("subject", cur.subject);
+      if (cur.body) url.searchParams.set("body", cur.body);
+    } else if (active === "phone") {
+      if (cur.number) url.searchParams.set("number", cur.number);
+    } else if (active === "sms") {
+      if (cur.number) url.searchParams.set("number", cur.number);
+      if (cur.message) url.searchParams.set("message", cur.message);
+    } else if (active === "vcard") {
+      if (cur.name) url.searchParams.set("name", cur.name);
+      if (cur.phone) url.searchParams.set("phone", cur.phone);
+      if (cur.email) url.searchParams.set("email", cur.email);
+      if (cur.company) url.searchParams.set("company", cur.company);
+    } else if (active === "location") {
+      if (cur.mapUrl) url.searchParams.set("mapUrl", cur.mapUrl);
+      if (cur.label) url.searchParams.set("label", cur.label);
+    } else if (active === "event") {
+      if (cur.title) url.searchParams.set("title", cur.title);
+      if (cur.location) url.searchParams.set("location", cur.location);
+    }
+
+    if (foreground !== "#17213b") url.searchParams.set("fg", foreground);
+    if (background !== "#ffffff") url.searchParams.set("bg", background);
+    if (pattern !== "square") url.searchParams.set("pattern", pattern);
+    if (frameStyle !== "none") url.searchParams.set("frameStyle", frameStyle);
+    if (frameText && frameText !== "SCAN TO CHECK IN") url.searchParams.set("frameText", frameText);
+
+    navigator.clipboard.writeText(url.toString());
+    setCopiedToast(true);
+    setTimeout(() => setCopiedToast(false), 3500);
   }
 
   function resetAll() {
@@ -662,15 +770,24 @@ export default function Home() {
             )}
           </div>
 
-          {/* Download Action & Scannability Checker */}
+          {/* Download Action, Share Link & Scannability Checker */}
           <div className="download-actions-group">
             <button className="download-button" disabled={!value} onClick={downloadPNG}>
               Download PNG <span>↓</span>
             </button>
             <button className="download-button secondary" disabled={!value} onClick={downloadSVG}>
-              Download Vector SVG <span>↓</span>
+              Download SVG <span>↓</span>
+            </button>
+            <button className="download-button share" disabled={!value} onClick={copyShareLink}>
+              🔗 Share Link
             </button>
           </div>
+
+          {copiedToast && (
+            <div className="share-toast">
+              ✓ Shareable QR preview link copied to clipboard! Anyone who opens this URL will see your exact QR code preview.
+            </div>
+          )}
 
           <div className={`scannability-card scannability-${scannability.status}`}>
             <div className="scannability-header">
