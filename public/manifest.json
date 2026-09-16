@@ -1,6 +1,6 @@
 {
-  "name": "qraft — Free Custom QR Code Generator",
-  "short_name": "qraft",
+  "name": "qrcode master — Free Custom QR Code Generator",
+  "short_name": "qrcode master",
   "description": "Design custom QR codes with logos, custom frames, gradients, and high resolution PNG export.",
   "start_url": "/",
   "display": "standalone",

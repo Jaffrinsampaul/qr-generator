@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import QRCanvas from "../components/qrCodeRender/QRCanvas";
 import FrameControls from "../components/customizer/FrameControls";
 import PatternControls from "../components/customizer/PatternControls";
+import { getScannabilityStatus } from "../utils/contrastChecker";
 
 const TYPES = [
   { id: "url", label: "Website", icon: "↗", hint: "Share a link" },
@@ -98,6 +100,12 @@ export default function Home() {
   const current = data[active];
   const update = (key, next) => setData((old) => ({ ...old, [active]: { ...old[active], [key]: next } }));
 
+  // Live Contrast & Scannability status
+  const scannability = useMemo(
+    () => getScannabilityStatus(foreground, background, transparent),
+    [foreground, background, transparent]
+  );
+
   function handleLogoUpload(event) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -118,9 +126,15 @@ export default function Home() {
     if (preset.eyeInner) setEyeInner(preset.eyeInner);
   }
 
-  function download() {
+  function downloadPNG() {
     if (canvasRef.current) {
       canvasRef.current.downloadPNG(`qr-${active}.png`);
+    }
+  }
+
+  function downloadSVG() {
+    if (canvasRef.current) {
+      canvasRef.current.downloadSVG(`qr-${active}.svg`);
     }
   }
 
@@ -151,9 +165,12 @@ export default function Home() {
       <header className="topbar">
         <div className="brand">
           <span className="brand-mark">▦</span>
-          <span>qraft</span>
+          <span>qrcode master</span>
         </div>
         <div className="topbar-actions">
+          <Link href="/blog" className="ghost-button">
+            📚 Guides & Tutorials
+          </Link>
           <span className="status-dot" /> Ready to create{" "}
           <button className="ghost-button" onClick={resetAll}>
             Start over
@@ -163,18 +180,22 @@ export default function Home() {
 
       <section className="hero">
         <div>
-          <p className="eyebrow">FREE CUSTOM QR CODE GENERATOR & STUDIO</p>
+          <div className="hero-badges">
+            <span className="hero-pill">⚡ 100% Free & No Signup</span>
+            <span className="hero-pill">🔒 Private Client-Side</span>
+            <span className="hero-pill">♾️ Never Expires</span>
+          </div>
           <h1>
             Create custom QR codes<br />
             <em>with logos & frames.</em>
           </h1>
           <p className="hero-copy">
-            Design high-resolution, branded QR codes for websites, Wi-Fi networks, contact cards, and events. 100% free and private in your browser.
+            Design high-resolution, branded QR codes for websites, Wi-Fi networks, contact cards, and events. Export high-DPI PNG or pure vector SVG files for free.
           </p>
         </div>
         <div className="hero-orbit">
           <span>9 formats</span>
-          <span>∞ possibilities</span>
+          <span>PNG & SVG Export</span>
         </div>
       </section>
 
@@ -641,11 +662,23 @@ export default function Home() {
             )}
           </div>
 
-          {/* Download Action */}
-          <button className="download-button" disabled={!value} onClick={download}>
-            Download PNG <span>↓</span>
-          </button>
-          <p className="safe-note">High contrast recommended for reliable scanning.</p>
+          {/* Download Action & Scannability Checker */}
+          <div className="download-actions-group">
+            <button className="download-button" disabled={!value} onClick={downloadPNG}>
+              Download PNG <span>↓</span>
+            </button>
+            <button className="download-button secondary" disabled={!value} onClick={downloadSVG}>
+              Download Vector SVG <span>↓</span>
+            </button>
+          </div>
+
+          <div className={`scannability-card scannability-${scannability.status}`}>
+            <div className="scannability-header">
+              <span className="scannability-badge">{scannability.badge}</span>
+              {scannability.ratio && <span className="scannability-ratio">{scannability.ratio}:1 Ratio</span>}
+            </div>
+            <p className="scannability-msg">{scannability.message}</p>
+          </div>
         </section>
       </section>
 
@@ -654,7 +687,7 @@ export default function Home() {
         {/* Features Showcase */}
         <section className="seo-section" id="features">
           <div className="seo-header">
-            <span className="seo-badge">WHY QRAFT</span>
+            <span className="seo-badge">WHY QRCODE MASTER</span>
             <h2>Complete Control Over Your QR Code Design</h2>
             <p className="seo-subtitle">
               Everything you need to create professional, scannable, and beautifully branded QR codes.
@@ -698,9 +731,9 @@ export default function Home() {
             </div>
             <div className="seo-card">
               <span className="card-icon">⚡</span>
-              <h3>Instant High-Resolution Export</h3>
+              <h3>Instant PNG & Vector SVG Export</h3>
               <p>
-                Export crisp PNG files formatted for high-DPI screens, printed banners, business cards, menu stands, and signage.
+                Export crisp PNG & vector SVG files formatted for high-DPI screens, printed banners, business cards, menu stands, and signage.
               </p>
             </div>
           </div>
@@ -717,39 +750,39 @@ export default function Home() {
           </div>
           <div className="formats-grid">
             <div className="format-box">
-              <h4>🌐 Website & URL</h4>
+              <h3>🌐 Website & URL</h3>
               <p>Direct users to any web page, landing page, portfolio, or online store link.</p>
             </div>
             <div className="format-box">
-              <h4>📶 Wi-Fi Access</h4>
+              <h3>📶 Wi-Fi Access</h3>
               <p>Allow guests to instantly join your Wi-Fi network without typing passwords.</p>
             </div>
             <div className="format-box">
-              <h4>📇 vCard Digital Contact</h4>
+              <h3>📇 vCard Digital Contact</h3>
               <p>Share your contact details, phone number, email, and company directly to phonebooks.</p>
             </div>
             <div className="format-box">
-              <h4>✉️ Email Compose</h4>
+              <h3>✉️ Email Compose</h3>
               <p>Pre-fill recipient email addresses, subject lines, and body text for quick feedback.</p>
             </div>
             <div className="format-box">
-              <h4>📞 Phone Dial</h4>
+              <h3>📞 Phone Dial</h3>
               <p>Enable one-tap phone calls directly to your support line or sales hotline.</p>
             </div>
             <div className="format-box">
-              <h4>💬 SMS Message</h4>
+              <h3>💬 SMS Message</h3>
               <p>Pre-fill SMS text messages for quick opt-in subscriptions or customer check-ins.</p>
             </div>
             <div className="format-box">
-              <h4>📍 Maps & Location</h4>
+              <h3>📍 Maps & Location</h3>
               <p>Direct customers to your store address, restaurant location, or GPS coordinates.</p>
             </div>
             <div className="format-box">
-              <h4>📅 Calendar Event</h4>
+              <h3>📅 Calendar Event</h3>
               <p>Prompt users to save webinars, meetups, or appointments directly to their calendar.</p>
             </div>
             <div className="format-box">
-              <h4>📝 Plain Text</h4>
+              <h3>📝 Plain Text</h3>
               <p>Encode plain text notes, serial numbers, cryptographic keys, or promo codes.</p>
             </div>
           </div>
@@ -774,8 +807,8 @@ export default function Home() {
             </div>
             <div className="step-card">
               <span className="step-num">03</span>
-              <h3>Preview & Download PNG</h3>
-              <p>Test your QR preview live on-screen, then download the high-resolution file for print or digital use.</p>
+              <h3>Preview & Download PNG or SVG</h3>
+              <p>Test your QR preview live on-screen, then download the high-resolution PNG or vector SVG file.</p>
             </div>
           </div>
         </section>
@@ -784,25 +817,25 @@ export default function Home() {
         <section className="seo-section" id="faq">
           <div className="seo-header">
             <span className="seo-badge">FREQUENTLY ASKED QUESTIONS</span>
-            <h2>Common Questions About qraft QR Code Studio</h2>
+            <h2>Common Questions About qrcode master Studio</h2>
           </div>
           <div className="faq-grid">
             <div className="faq-card">
-              <h3>Is qraft QR code generator 100% free?</h3>
+              <h3>Is qrcode master QR code generator 100% free?</h3>
               <p>
-                Yes! qraft is completely free to use without any hidden fees, subscriptions, or scan limits. You can generate as many QR codes as you need.
+                Yes! qrcode master is completely free to use without any hidden fees, subscriptions, or scan limits. You can generate as many QR codes as you need.
               </p>
             </div>
             <div className="faq-card">
-              <h3>Do QR codes created on qraft ever expire?</h3>
+              <h3>Do QR codes created on qrcode master ever expire?</h3>
               <p>
-                No. All static QR codes created on qraft are permanent. The data is hardcoded into the QR pattern itself, so it will continue working forever without relying on external redirect servers.
+                No. All static QR codes created on qrcode master are permanent. The data is hardcoded into the QR pattern itself, so it will continue working forever without relying on external redirect servers.
               </p>
             </div>
             <div className="faq-card">
               <h3>Is my personal data or Wi-Fi password secure?</h3>
               <p>
-                Absolutely. qraft runs entirely client-side inside your web browser. None of your entered details, passwords, or uploaded logos are sent to any remote server.
+                Absolutely. qrcode master runs entirely client-side inside your web browser. None of your entered details, passwords, or uploaded logos are sent to any remote server.
               </p>
             </div>
             <div className="faq-card">
@@ -814,7 +847,7 @@ export default function Home() {
             <div className="faq-card">
               <h3>How do I ensure my custom QR code scans reliably?</h3>
               <p>
-                Always maintain high contrast between the ink color and paper background. Avoid dark backgrounds with dark inks, and ensure your logo doesn&apos;t obscure the corner finder eyes.
+                Always maintain high contrast between the ink color and paper background. Our automated live contrast checker notifies you instantly if your colors fall below the recommended WCAG scan ratio.
               </p>
             </div>
           </div>
@@ -822,8 +855,18 @@ export default function Home() {
       </section>
 
       <footer>
-        <span>qraft studio</span>
-        <span>Private by design · Nothing leaves your browser</span>
+        <div className="footer-content">
+          <div>
+            <strong>qrcode master studio</strong>
+            <p>Private by design · Nothing leaves your browser</p>
+          </div>
+          <div className="footer-links">
+            <Link href="/blog">Guides & Tutorials</Link>
+            <Link href="/blog/how-to-make-qr-code-for-wifi">Wi-Fi QR Guide</Link>
+            <Link href="/blog/how-to-put-logo-in-qr-code">Logo Embedding Guide</Link>
+            <Link href="/blog/static-vs-dynamic-qr-codes-expiration">Static vs Dynamic QR</Link>
+          </div>
+        </div>
       </footer>
     </main>
   );

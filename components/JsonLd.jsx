@@ -1,13 +1,13 @@
 export default function JsonLd() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://qraft-qr.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://qrcodemaster.vercel.app";
 
   const webAppSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "qraft — QR code studio",
-    "alternateName": ["qraft", "qraft QR Generator", "qraft studio"],
+    "name": "qrcode master — QR code studio",
+    "alternateName": ["qrcode master", "qrcode master QR Generator", "qrcode master studio"],
     "url": siteUrl,
-    "description": "Free, instant, private QR code generator. Design custom QR codes with logos, custom frames, gradients, shapes, Wi-Fi login, vCard contacts, URLs & high-res PNG export.",
+    "description": "Free, instant, private QR code generator. Design custom QR codes with logos, custom frames, gradients, shapes, Wi-Fi login, vCard contacts, URLs & high-res PNG / SVG vector export.",
     "applicationCategory": "DesignApplication",
     "operatingSystem": "All",
     "browserRequirements": "Requires JavaScript. Requires HTML5.",
@@ -30,14 +30,15 @@ export default function JsonLd() {
       "Independent Eye Color Customization (Separate Outer Frame & Inner Ball Colors)",
       "Custom Color Palettes & Linear/Radial Dual Ink Gradients",
       "Center Logo & Image Overlay Integration (PNG, SVG, WEBP, JPEG)",
-      "Transparent Background Alpha PNG Output",
+      "Transparent Background Alpha PNG & Vector SVG Output",
+      "Automated Real-Time Color Contrast & Scannability Checker",
       "Level H High Error Correction (~30% Matrix Recovery)",
-      "3x High-DPI Retina Canvas Rendering & High-Res PNG Download",
+      "3x High-DPI Retina Canvas Rendering & High-Res PNG & Vector SVG Download",
       "100% Client-Side Private Processing (Zero Server Data Retention)"
     ],
     "creator": {
       "@type": "Organization",
-      "name": "qraft studio",
+      "name": "qrcode master studio",
       "url": siteUrl
     }
   };
@@ -56,7 +57,7 @@ export default function JsonLd() {
     "tool": [
       {
         "@type": "HowToTool",
-        "name": "qraft QR Code Studio"
+        "name": "qrcode master QR Code Studio"
       }
     ],
     "step": [
@@ -87,8 +88,8 @@ export default function JsonLd() {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "qraft — QR Code Studio",
-    "alternateName": "qraft QR Generator",
+    "name": "qrcode master — QR Code Studio",
+    "alternateName": "qrcode master QR Generator",
     "url": siteUrl,
     "potentialAction": {
       "@type": "SearchAction",
@@ -106,18 +107,18 @@ export default function JsonLd() {
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "Is qraft QR code generator completely free?",
+        "name": "Is qrcode master QR code generator completely free?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, qraft is 100% free to use. You can generate unlimited custom QR codes with frames, colors, and center logos without signing up or paying any fee."
+          "text": "Yes, qrcode master is 100% free to use. You can generate unlimited custom QR codes with frames, colors, and center logos without signing up or paying any fee."
         }
       },
       {
         "@type": "Question",
-        "name": "Do QR codes generated with qraft ever expire?",
+        "name": "Do QR codes generated with qrcode master ever expire?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No, all static QR codes created on qraft are permanent and never expire. Because data is encoded directly into the matrix, your QR codes will work indefinitely."
+          "text": "No, all static QR codes created on qrcode master are permanent and never expire. Because data is encoded directly into the matrix, your QR codes will work indefinitely."
         }
       },
       {
@@ -125,7 +126,7 @@ export default function JsonLd() {
         "name": "Is my data stored or tracked on servers?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No! qraft operates entirely in your browser (client-side). Your links, Wi-Fi passwords, contact cards, and uploaded logos never leave your device."
+          "text": "No! qrcode master operates entirely in your browser (client-side). Your links, Wi-Fi passwords, contact cards, and uploaded logos never leave your device."
         }
       },
       {
@@ -138,10 +139,10 @@ export default function JsonLd() {
       },
       {
         "@type": "Question",
-        "name": "What QR code types does qraft support?",
+        "name": "What QR code types does qrcode master support?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "qraft supports 9 rich format types: Websites (URL), Plain Text, Wi-Fi auto-connect, Email, Phone Numbers, SMS, vCard Contact Cards, Geolocation, and Calendar Events."
+          "text": "qrcode master supports 9 rich format types: Websites (URL), Plain Text, Wi-Fi auto-connect, Email, Phone Numbers, SMS, vCard Contact Cards, Geolocation, and Calendar Events."
         }
       }
     ]
@@ -150,12 +151,12 @@ export default function JsonLd() {
   const orgSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "qraft studio",
+    "name": "qrcode master studio",
     "url": siteUrl,
     "logo": `${siteUrl}/icon.png`,
     "sameAs": [
-      "https://twitter.com/qraftstudio",
-      "https://github.com/qraftstudio"
+      "https://twitter.com/qrcodemaster",
+      "https://github.com/qrcodemaster"
     ]
   };
 

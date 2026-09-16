@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import { generateQRMatrix, isFinderPattern } from "../../utils/qrcodegen";
+import { generateSVGString } from "../../utils/svgGenerator";
 
 const QRCanvas = forwardRef(function QRCanvas(
   {
@@ -62,6 +63,39 @@ const QRCanvas = forwardRef(function QRCanvas(
       link.download = filename;
       link.href = canvas.toDataURL("image/png");
       link.click();
+    },
+    downloadSVG: (filename = `qr-code.svg`) => {
+      const svgStr = generateSVGString({
+        value,
+        size,
+        foreground,
+        background,
+        transparent,
+        logo,
+        logoSizePercent,
+        logoRotation,
+        pattern,
+        eyeOuter,
+        eyeInner,
+        customEyeColor,
+        eyeOuterColor,
+        eyeInnerColor,
+        useGradient,
+        gradientEnd,
+        frameStyle,
+        frameText,
+        frameTitle,
+        frameColor,
+        frameTextColor,
+      });
+      if (!svgStr) return;
+      const blob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = filename;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
     },
   }));
 
